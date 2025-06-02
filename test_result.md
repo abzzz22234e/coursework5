@@ -177,6 +177,7 @@ test_plan:
     - "API Endpoint Testing"
     - "Database Connection"
     - "Error Handling"
+    - "Static File Serving"
   stuck_tasks: []
   test_all: true
   test_priority: "high_first"
