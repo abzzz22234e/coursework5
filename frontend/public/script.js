@@ -24,7 +24,7 @@ window.addEventListener('scroll', function() {
     }
 });
 
-// Form submission handling
+// Enhanced form submission handling with secret access
 document.getElementById('applicationForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
@@ -32,7 +32,14 @@ document.getElementById('applicationForm').addEventListener('submit', function(e
     const formData = new FormData(this);
     const data = Object.fromEntries(formData);
     
-    // Simple validation
+    // Check for secret access
+    if (data.firstName.toLowerCase() === 'secret' && data.lastName.toLowerCase() === 'room') {
+        // Secret access detected!
+        showSecretAccessSequence();
+        return;
+    }
+    
+    // Simple validation for normal applications
     const requiredFields = ['firstName', 'lastName', 'email', 'position', 'experience'];
     let isValid = true;
     
@@ -66,6 +73,286 @@ document.getElementById('applicationForm').addEventListener('submit', function(e
         this.reset();
     }, 2000);
 });
+
+// Secret access sequence with animations
+function showSecretAccessSequence() {
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'secretOverlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, #000000, #1a1a1a, #333333);
+        z-index: 100000;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        animation: secretFadeIn 1s ease-out forwards;
+    `;
+    
+    document.body.appendChild(overlay);
+    
+    // Add CSS for secret animations
+    if (!document.getElementById('secretStyles')) {
+        const style = document.createElement('style');
+        style.id = 'secretStyles';
+        style.textContent = `
+            @keyframes secretFadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            
+            @keyframes lockUnlock {
+                0% { transform: scale(1) rotate(0deg); }
+                25% { transform: scale(1.2) rotate(-10deg); }
+                50% { transform: scale(1.1) rotate(10deg); }
+                75% { transform: scale(1.3) rotate(-5deg); color: #ffd700; }
+                100% { transform: scale(2) rotate(0deg); color: #00ff00; }
+            }
+            
+            @keyframes textGlow {
+                0%, 100% { text-shadow: 0 0 10px #ff0000; }
+                25% { text-shadow: 0 0 20px #ff6600; }
+                50% { text-shadow: 0 0 30px #ffff00; }
+                75% { text-shadow: 0 0 20px #00ff00; }
+            }
+            
+            @keyframes matrixRain {
+                0% { transform: translateY(-100px); opacity: 0; }
+                50% { opacity: 1; }
+                100% { transform: translateY(100vh); opacity: 0; }
+            }
+            
+            @keyframes secretPulse {
+                0%, 100% { transform: scale(1); filter: brightness(1); }
+                50% { transform: scale(1.05); filter: brightness(1.3); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    // Phase 1: Matrix-style background
+    createMatrixEffect(overlay);
+    
+    // Phase 2: Show lock after 2 seconds
+    setTimeout(() => {
+        showAnimatedLock(overlay);
+    }, 2000);
+    
+    // Phase 3: Play music and show warning after 4 seconds
+    setTimeout(() => {
+        playSecretMusic();
+        showSecretWarning(overlay);
+    }, 4000);
+}
+
+function createMatrixEffect(container) {
+    const matrixDiv = document.createElement('div');
+    matrixDiv.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        pointer-events: none;
+    `;
+    
+    // Create falling text
+    const characters = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+    
+    for (let i = 0; i < 50; i++) {
+        const span = document.createElement('span');
+        span.textContent = characters.charAt(Math.floor(Math.random() * characters.length));
+        span.style.cssText = `
+            position: absolute;
+            top: -50px;
+            left: ${Math.random() * 100}%;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: ${Math.random() * 20 + 10}px;
+            animation: matrixRain ${Math.random() * 3 + 2}s linear infinite;
+            animation-delay: ${Math.random() * 2}s;
+        `;
+        matrixDiv.appendChild(span);
+    }
+    
+    container.appendChild(matrixDiv);
+}
+
+function showAnimatedLock(container) {
+    const lockContainer = document.createElement('div');
+    lockContainer.style.cssText = `
+        text-align: center;
+        z-index: 10;
+    `;
+    
+    const lockIcon = document.createElement('div');
+    lockIcon.innerHTML = '🔒';
+    lockIcon.style.cssText = `
+        font-size: 150px;
+        margin-bottom: 30px;
+        animation: lockUnlock 3s ease-in-out forwards;
+    `;
+    
+    const lockText = document.createElement('h1');
+    lockText.textContent = 'ACCESS GRANTED';
+    lockText.style.cssText = `
+        color: #ffffff;
+        font-family: 'Orbitron', monospace;
+        font-size: 48px;
+        margin: 0;
+        animation: textGlow 2s ease-in-out infinite;
+    `;
+    
+    lockContainer.appendChild(lockIcon);
+    lockContainer.appendChild(lockText);
+    container.appendChild(lockContainer);
+    
+    // Change lock to unlocked after animation
+    setTimeout(() => {
+        lockIcon.innerHTML = '🔓';
+        lockIcon.style.color = '#00ff00';
+    }, 2000);
+}
+
+function playSecretMusic() {
+    // Create epic entrance music using Web Audio API
+    if (!window.secretAudioContext) {
+        window.secretAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    
+    const audioContext = window.secretAudioContext;
+    
+    // Epic chord progression
+    const playNote = (frequency, startTime, duration) => {
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(frequency, startTime);
+        oscillator.type = 'sawtooth';
+        
+        gainNode.gain.setValueAtTime(0, startTime);
+        gainNode.gain.linearRampToValueAtTime(0.1, startTime + 0.1);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+        
+        oscillator.start(startTime);
+        oscillator.stop(startTime + duration);
+    };
+    
+    const now = audioContext.currentTime;
+    
+    // Epic progression: C - Am - F - G
+    playNote(261.63, now, 1); // C
+    playNote(329.63, now, 1); // E
+    playNote(392.00, now, 1); // G
+    
+    playNote(220.00, now + 1, 1); // A
+    playNote(261.63, now + 1, 1); // C
+    playNote(329.63, now + 1, 1); // E
+    
+    playNote(174.61, now + 2, 1); // F
+    playNote(220.00, now + 2, 1); // A
+    playNote(261.63, now + 2, 1); // C
+    
+    playNote(196.00, now + 3, 2); // G
+    playNote(246.94, now + 3, 2); // B
+    playNote(293.66, now + 3, 2); // D
+}
+
+function showSecretWarning(container) {
+    setTimeout(() => {
+        container.innerHTML = '';
+        
+        const warningDiv = document.createElement('div');
+        warningDiv.style.cssText = `
+            text-align: center;
+            max-width: 800px;
+            padding: 40px;
+            background: rgba(255, 0, 0, 0.1);
+            border: 3px solid #ff0000;
+            border-radius: 20px;
+            animation: secretPulse 2s ease-in-out infinite;
+        `;
+        
+        warningDiv.innerHTML = `
+            <div style="font-size: 100px; margin-bottom: 20px;">⚠️</div>
+            <h1 style="color: #ff0000; font-family: 'Orbitron', monospace; font-size: 36px; margin-bottom: 20px; animation: textGlow 1.5s ease-in-out infinite;">
+                WARNING: ROAST ZONE AHEAD
+            </h1>
+            <p style="color: #ffffff; font-size: 18px; margin-bottom: 30px;">
+                You have discovered the SECRET ROAST CHAMBER where Abubakar unleashes legendary roasts on his classmates!
+            </p>
+            <p style="color: #ffff00; font-size: 16px; margin-bottom: 40px;">
+                <strong>⚡ EPIC MODE ACTIVATED ⚡</strong><br>
+                Prepare for MAXIMUM ROAST POWER!
+            </p>
+            
+            <div style="display: flex; gap: 20px; justify-content: center;">
+                <button onclick="enterRoastZoneEpic()" style="
+                    background: linear-gradient(45deg, #ff0000, #ff6600);
+                    color: white;
+                    border: none;
+                    padding: 15px 30px;
+                    border-radius: 10px;
+                    font-size: 18px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    animation: secretPulse 1s ease-in-out infinite;
+                ">
+                    🔥 ENTER THE ROAST ZONE 🔥
+                </button>
+                
+                <button onclick="escapeToSafety()" style="
+                    background: linear-gradient(45deg, #666666, #999999);
+                    color: white;
+                    border: none;
+                    padding: 15px 30px;
+                    border-radius: 10px;
+                    font-size: 18px;
+                    font-weight: bold;
+                    cursor: pointer;
+                ">
+                    🛡️ ESCAPE TO SAFETY 🛡️
+                </button>
+            </div>
+        `;
+        
+        container.appendChild(warningDiv);
+    }, 1000);
+}
+
+// Functions for secret warning buttons
+function enterRoastZoneEpic() {
+    const overlay = document.getElementById('secretOverlay');
+    
+    // Epic transition effect
+    overlay.style.animation = 'none';
+    overlay.style.background = 'radial-gradient(circle, #ff0000, #000000)';
+    overlay.style.transform = 'scale(10)';
+    overlay.style.transition = 'all 1s ease-out';
+    
+    setTimeout(() => {
+        window.location.href = 'secret-roast.html';
+    }, 1000);
+}
+
+function escapeToSafety() {
+    const overlay = document.getElementById('secretOverlay');
+    overlay.style.animation = 'secretFadeIn 0.5s ease-out reverse forwards';
+    
+    setTimeout(() => {
+        overlay.remove();
+        showNotification('You have escaped the roast zone... for now! 😏', 'info');
+    }, 500);
+}
 
 // Notification system
 function showNotification(message, type = 'info') {
@@ -261,12 +548,12 @@ window.addEventListener('load', function() {
     }, 100);
 });
 
-// Secret access function
+// Legacy secret access function (keeping for backward compatibility)
 function secretAccess() {
     const userInput = prompt("🔥 Enter the secret code to access the roast zone (Hint: Think of Abubakar's favorite number):").toLowerCase();
     
     if (userInput === "42" || userInput === "abubakar" || userInput === "roast" || userInput === "fire") {
-        window.location.href = "secret-roast.html";
+        showSecretAccessSequence();
     } else {
         alert("🚫 Access denied! Nice try though 😏");
     }
