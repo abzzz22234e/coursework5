@@ -141,17 +141,17 @@ backend:
         agent: "testing"
         comment: "MongoDB connection is working correctly. Successfully created and retrieved data from the database through the API endpoints."
 
-  - task: "Error Handling"
-    implemented: true
-    working: true
+  - task: "Static File Serving"
+    implemented: false
+    working: "NA"
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
     needs_retesting: false
     status_history:
-      - working: true
+      - working: "NA"
         agent: "testing"
-        comment: "Error handling is implemented correctly. Invalid requests return appropriate error codes (422 for invalid payload, 404 for invalid endpoint)."
+        comment: "Static file serving is not implemented in the backend server.py file. There is no StaticFiles middleware or route configured to serve static files from the frontend/public directory."
 
 metadata:
   created_by: "testing_agent"
